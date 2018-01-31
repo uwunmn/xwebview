@@ -11,6 +11,7 @@ import WebKit
 public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
     
     private let webView: UIWebView
+    weak var delegate: UIWebViewDelegate?
     
     //MARK: - XWebViewEngine
     
@@ -32,32 +33,51 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
         let result = self.webView.stringByEvaluatingJavaScript(from: js)
         completionHandler?(result, nil)
     }
-    
+
     //MARK: - UIWebViewDelegate
     
     public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        self.executeJavaScript(js: "typeof window == 'object'") { (object, error) in
-            print(object)
-            print(error)
+        return self.delegate?.webView?(webView, shouldStartLoadWith: request, navigationType: navigationType) ?? true
+    }
+    
+    public func webViewDidStartLoad(_ webView: UIWebView) {
+        self.delegate?.webViewDidStartLoad?(webView)
+    }
+    
+    public func webViewDidFinishLoad(_ webView: UIWebView) {
+        self.delegate?.webViewDidFinishLoad?(webView)
+    }
+    
+    public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
+        self.delegate?.webView?(webView, didFailLoadWithError: error)
+    }
+    
+}
+
+public class UIWebViewDelegateImpl: NSObject, UIWebViewDelegate {
+    
+    weak var viewController: XViewController?
+    
+    init(viewController: XViewController) {
+        self.viewController = viewController
+    }
+    
+    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
+        if let controller = self.viewController {
+            return controller.webViewShouldStartLoadWith(request)
         }
         return true
     }
     
     public func webViewDidStartLoad(_ webView: UIWebView) {
-        self.executeJavaScript(js: "typeof window == 'object'") { (object, error) in
-            print(object)
-            print(error)
-        }
+        self.viewController?.webViewDidStartLoad()
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
-        self.executeJavaScript(js: "typeof window == 'object'") { (object, error) in
-            print(object)
-            print(error)
-        }
+        self.viewController?.webViewDidFinishLoad()
     }
     
     public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
-        
+        self.viewController?.webViewDidFailLoadWith(error)
     }
 }

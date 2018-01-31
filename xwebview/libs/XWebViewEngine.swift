@@ -16,5 +16,4 @@ public protocol XWebViewEngine: class {
     func loadRequest(request: URLRequest)
     
     func executeJavaScript(js: String, completionHandler: ((Any?, Error?) -> Void)?)
-
 }

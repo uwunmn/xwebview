@@ -10,9 +10,12 @@ import UIKit
 
 public class XViewController: UIViewController {
     private var webViewEngine: XWebViewEngine?
-    private let messageDispatcher: XMessageDispatcher
     private var pluginObjectMap: [String: XPlugin] = [: ]
     private var url: URL?
+    
+    private lazy var jsBridge: XJSBridge = {
+        return XJSBridge(viewController: self)
+    }()
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -23,7 +26,6 @@ public class XViewController: UIViewController {
     }
     
     public init(url: URL?) {
-        self.messageDispatcher = XMessageDispatcher(viewController: self)
         super.init(nibName: nil, bundle: nil)
         self.url = url
     }
@@ -39,7 +41,10 @@ public class XViewController: UIViewController {
         self.loadRequest(withURL: url)
     }
     
-    public func executeJavaScript(js: String, completionHandler: ((Any?, Error?) -> Void)?) {
+    public func executeJavaScript(js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        guard let js = js else {
+            return
+        }
         self.webViewEngine?.executeJavaScript(js: js, completionHandler: completionHandler)
     }
     
@@ -51,14 +56,38 @@ public class XViewController: UIViewController {
         let plugin = self.pluginObjectMap[name]
         if plugin == nil {
             if let pluginType = NSClassFromString(name) as? XPlugin.Type {
-                if let p = pluginType.init(withWebViewEngine: self.webViewEngine) {
-                    self.register(withName: name, plugin: p)
-                    return p
-                }
+                let p = pluginType.init(viewController: self)
+                self.register(withName: name, plugin: p)
+                return p
             }
         }
         return nil
     }
+    
+    public func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
+        if self.jsBridge.interceptRequest(request) {
+            return false
+        }
+        return true
+    }
+    
+    public func webViewDidStartLoad() {
+        
+    }
+    
+    public func webViewDidFinishLoad() {
+        self.jsBridge.injectJS()
+    }
+    
+    public func webViewIsLoadingWith(_ progress: TimeInterval) {
+        
+    }
+    
+    public func webViewDidFailLoadWith(_ error: Error) {
+        
+    }
+    
+    //MARK: - private
     
     private func loadRequest(withURL url: URL?) {
         guard let url = url else {
@@ -75,7 +104,9 @@ public class XViewController: UIViewController {
     }
     
     private func createWebViewEngine() -> XWebViewEngine {
-        return UIWebViewEngine(frame: self.view.bounds)
+        let engine = UIWebViewEngine(frame: self.view.bounds)
+        engine.delegate = UIWebViewDelegateImpl(viewController: self)
+        return engine
     }
     
 }

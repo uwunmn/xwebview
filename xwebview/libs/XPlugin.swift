@@ -10,7 +10,7 @@ import UIKit
 
 public class XPlugin: NSObject {
     
-    private weak var viewController: XViewController!
+    private weak var viewController: XViewController?
 
     required public init(viewController: XViewController) {
         self.viewController = viewController
