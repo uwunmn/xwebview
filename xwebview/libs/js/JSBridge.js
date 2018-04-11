@@ -34,12 +34,11 @@
     function callback() {
         try {
             var callbackId = arguments[0];
-            var status = arguments[1];
-            var data = arguments[2];
+            var result = arguments[1];
 
             if (callbackId) {
                 var callback = callbacks[callbackId];
-                callback && typeof callback === 'function' && callback(status, data)
+                callback && typeof callback === 'function' && callback(result)
             }
         } catch (error) {
             console.log('callback(status, callbackId, data)');

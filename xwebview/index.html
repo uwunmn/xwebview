@@ -77,8 +77,8 @@
 
         connectJSBridge(function(bridge) {
             window.sendMessage = function() {
-                bridge.invoke('Demo', 'hello', {}, function(status, data) {
-                    log('Hello response', 'status: ' + status + ', data: ' + JSON.stringify(data));
+                bridge.invoke('Demo', 'hello', {}, function(result) {
+                    log('Hello response', 'status: ' + result[0] + ', data: ' + JSON.stringify(result[1]));
                 });
             };
         });

@@ -119,15 +119,10 @@ public class XViewController: UIViewController {
         }
     }
 
-    func callbackToJS(callbackId: String, status: Int, data: [String: Any]? = nil) {
-        var jsonString: String? = nil
-        if let data = data, let json = try? JSONSerialization.data(withJSONObject: data, options: .sortedKeys) {
-            jsonString = String(data: json, encoding: String.Encoding.utf8)
-        }
-        
-        var js = "JSBridge.callback('\(callbackId)', \(status)"
-        if let s = jsonString {
-            js = js + ", " + s
+    func callbackToJS(callbackId: String, result: XPluginResult) {
+        var js = "JSBridge.callback('\(callbackId)'"
+        if let json = result.jsonString {
+            js = js + ", " + json
         }
         js = js + ")"
         
@@ -136,19 +131,19 @@ public class XViewController: UIViewController {
         }
     }
     
-    private func messageQueue(with jsonString: String) -> [XMessage?]? {
+    private func messageQueue(with jsonString: String) -> [XPluginMessage?]? {
         guard let data = jsonString.data(using: .utf8) else {
             return nil
         }
         guard let jsonArray = (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)) as? [Any] else {
             return nil
         }
-        return jsonArray.flatMap { (data) -> XMessage? in
-            return XMessage(array: data as? [Any])
+        return jsonArray.flatMap { (data) -> XPluginMessage? in
+            return XPluginMessage(array: data as? [Any])
         }
     }
     
-    private func exec(_ message: XMessage) {
+    private func exec(_ message: XPluginMessage) {
         let plugin = self.plugin(named: message.plugin)
         let method: Selector = NSSelectorFromString("\(message.action):")
         

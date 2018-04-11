@@ -13,7 +13,7 @@ public class XJSBridge {
     private let JBX_SCHEME = "jsbridgex"
     private let JBX_HOST = "ready"
     
-    private var messages: [XMessage] = []
+    private var messages: [XPluginMessage] = []
     private var eventUniqueId = 0
     private var isBridgeReady = false
     

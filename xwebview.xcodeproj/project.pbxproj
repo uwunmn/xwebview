@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		261DA3F8207AFB330095A477 /* JSBridge.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 261DA3F7207AFB330095A477 /* JSBridge.min.js */; };
+		261DA41C207DE5660095A477 /* XPluginResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 261DA41B207DE5660095A477 /* XPluginResult.swift */; };
 		262B380F200F4D6100C7E68A /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 262B380E200F4D6100C7E68A /* index.html */; };
 		2674A52E2003542E007F10BE /* DemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674A52D2003542E007F10BE /* DemoViewController.swift */; };
 		2674A531200355BB007F10BE /* XJSBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674A530200355BB007F10BE /* XJSBridge.swift */; };
@@ -16,7 +17,7 @@
 		26917E891FFB7EED0089D0DD /* XViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E881FFB7EED0089D0DD /* XViewController.swift */; };
 		26917E911FFB81E90089D0DD /* WKWebViewEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E8F1FFB81E90089D0DD /* WKWebViewEngine.swift */; };
 		26917E921FFB81E90089D0DD /* UIWebViewEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E901FFB81E90089D0DD /* UIWebViewEngine.swift */; };
-		26917E941FFB84B60089D0DD /* XMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E931FFB84B60089D0DD /* XMessage.swift */; };
+		26917E941FFB84B60089D0DD /* XPluginMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E931FFB84B60089D0DD /* XPluginMessage.swift */; };
 		26E01C881FF6436500D371D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01C871FF6436500D371D7 /* AppDelegate.swift */; };
 		26E01C8F1FF6436500D371D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26E01C8E1FF6436500D371D7 /* Assets.xcassets */; };
 		26F37DA92022C58100617A7A /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F37DA82022C58100617A7A /* Demo.swift */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		261DA3F7207AFB330095A477 /* JSBridge.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = JSBridge.min.js; sourceTree = "<group>"; };
+		261DA41B207DE5660095A477 /* XPluginResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPluginResult.swift; sourceTree = "<group>"; };
 		262B380E200F4D6100C7E68A /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		2674A52D2003542E007F10BE /* DemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoViewController.swift; sourceTree = "<group>"; };
 		2674A530200355BB007F10BE /* XJSBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XJSBridge.swift; sourceTree = "<group>"; };
@@ -32,7 +34,7 @@
 		26917E881FFB7EED0089D0DD /* XViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XViewController.swift; sourceTree = "<group>"; };
 		26917E8F1FFB81E90089D0DD /* WKWebViewEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewEngine.swift; sourceTree = "<group>"; };
 		26917E901FFB81E90089D0DD /* UIWebViewEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIWebViewEngine.swift; sourceTree = "<group>"; };
-		26917E931FFB84B60089D0DD /* XMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMessage.swift; sourceTree = "<group>"; };
+		26917E931FFB84B60089D0DD /* XPluginMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPluginMessage.swift; sourceTree = "<group>"; };
 		26E01C841FF6436500D371D7 /* xwebview.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xwebview.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26E01C871FF6436500D371D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		26E01C8E1FF6436500D371D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -68,7 +70,8 @@
 				26917E861FFB7E3C0089D0DD /* XWebViewEngine.swift */,
 				2674A530200355BB007F10BE /* XJSBridge.swift */,
 				26917E881FFB7EED0089D0DD /* XViewController.swift */,
-				26917E931FFB84B60089D0DD /* XMessage.swift */,
+				26917E931FFB84B60089D0DD /* XPluginMessage.swift */,
+				261DA41B207DE5660095A477 /* XPluginResult.swift */,
 			);
 			path = libs;
 			sourceTree = "<group>";
@@ -192,12 +195,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26917E941FFB84B60089D0DD /* XMessage.swift in Sources */,
+				26917E941FFB84B60089D0DD /* XPluginMessage.swift in Sources */,
 				26917E921FFB81E90089D0DD /* UIWebViewEngine.swift in Sources */,
 				26917E891FFB7EED0089D0DD /* XViewController.swift in Sources */,
 				26917E871FFB7E3C0089D0DD /* XWebViewEngine.swift in Sources */,
 				26917E911FFB81E90089D0DD /* WKWebViewEngine.swift in Sources */,
 				2674A531200355BB007F10BE /* XJSBridge.swift in Sources */,
+				261DA41C207DE5660095A477 /* XPluginResult.swift in Sources */,
 				26F37DA92022C58100617A7A /* Demo.swift in Sources */,
 				26917E851FFB7D850089D0DD /* XPlugin.swift in Sources */,
 				26E01C881FF6436500D371D7 /* AppDelegate.swift in Sources */,

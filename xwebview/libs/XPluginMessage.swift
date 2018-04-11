@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class XMessage: NSObject {
+public class XPluginMessage: NSObject {
     
     public var plugin: String
     public var action: String

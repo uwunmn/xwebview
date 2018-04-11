@@ -23,7 +23,10 @@ public class XPlugin: NSObject {
         self.viewController = viewController
     }
     
-    public func callback(callbackId: String, status: Int, data: [String: Any]? = nil) {
-        self.viewController?.callbackToJS(callbackId: callbackId, status: status, data: data)
+    public func callback(callbackId: String?, result: XPluginResult) {
+        guard let callbackId = callbackId else {
+            return
+        }
+        self.viewController?.callbackToJS(callbackId: callbackId, result: result)
     }
 }
