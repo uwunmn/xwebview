@@ -118,6 +118,23 @@ public class XViewController: UIViewController {
             }
         }
     }
+
+    func callbackToJS(callbackId: String, status: Int, data: [String: Any]? = nil) {
+        var jsonString: String? = nil
+        if let data = data, let json = try? JSONSerialization.data(withJSONObject: data, options: .sortedKeys) {
+            jsonString = String(data: json, encoding: String.Encoding.utf8)
+        }
+        
+        var js = "JSBridge.callback('\(callbackId)', \(status)"
+        if let s = jsonString {
+            js = js + ", " + s
+        }
+        js = js + ")"
+        
+        self.engine?.executeJavaScript(js: js) { (object, error) in
+            
+        }
+    }
     
     private func messageQueue(with jsonString: String) -> [XMessage?]? {
         guard let data = jsonString.data(using: .utf8) else {
@@ -133,9 +150,9 @@ public class XViewController: UIViewController {
     
     private func exec(_ message: XMessage) {
         let plugin = self.plugin(named: message.plugin)
-        let method: Selector = NSSelectorFromString("\(message.action)")
+        let method: Selector = NSSelectorFromString("\(message.action):")
         
-        _ = plugin?.perform(method)
+        _ = plugin?.perform(method, with: message)
     }
     
     private func plugin(named name: String) -> XPlugin? {

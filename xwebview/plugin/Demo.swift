@@ -10,9 +10,11 @@ import UIKit
 
 class Demo: XPlugin {
     
-    @objc func hello() {
-        print("hello")
+    @objc func hello(_ message: XMessage) {
         self.viewController?.navigationController?.pushViewController(DemoViewController(), animated: true)
+        if let callbackId = message.callbackId {
+            self.callback(callbackId: callbackId, status: 1, data: ["say": "hello"])
+        }
     }
     
 }

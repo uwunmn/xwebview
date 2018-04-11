@@ -33,11 +33,14 @@
     //native回调
     function callback() {
         try {
-            var status = arguments[0];
-            var callbackId = arguments[1];
+            var callbackId = arguments[0];
+            var status = arguments[1];
             var data = arguments[2];
-    
-            var callback = callbacks[callbackId];
+
+            if (callbackId) {
+                var callback = callbacks[callbackId];
+                callback && typeof callback === 'function' && callback(status, data)
+            }
         } catch (error) {
             console.log('callback(status, callbackId, data)');
         }
