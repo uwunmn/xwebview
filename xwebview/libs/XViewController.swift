@@ -9,13 +9,9 @@
 import UIKit
 
 public class XViewController: UIViewController {
-    private var webViewEngine: XWebViewEngine?
+    private var engine: XWebViewEngine?
     private var pluginObjectMap: [String: XPlugin] = [: ]
     private var url: URL?
-    
-    private lazy var jsBridge: XJSBridge = {
-        return XJSBridge(viewController: self)
-    }()
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -32,7 +28,7 @@ public class XViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.initView()
+        self.initWebViewEngine()
         self.loadRequest(withURL: self.url)
     }
     
@@ -45,27 +41,15 @@ public class XViewController: UIViewController {
         guard let js = js else {
             return
         }
-        self.webViewEngine?.executeJavaScript(js: js, completionHandler: completionHandler)
+        self.engine?.executeJavaScript(js: js, completionHandler: completionHandler)
     }
     
     public func register(withName name: String, plugin: XPlugin) {
         self.pluginObjectMap[name] = plugin
     }
     
-    public func plugin(named name: String) -> XPlugin? {
-        let plugin = self.pluginObjectMap[name]
-        if plugin == nil {
-            if let pluginType = NSClassFromString(name) as? XPlugin.Type {
-                let p = pluginType.init(viewController: self)
-                self.register(withName: name, plugin: p)
-                return p
-            }
-        }
-        return nil
-    }
-    
     public func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
-        if self.jsBridge.interceptRequest(request) {
+        if self.intercept(request: request) {
             return false
         }
         return true
@@ -76,7 +60,7 @@ public class XViewController: UIViewController {
     }
     
     public func webViewDidFinishLoad() {
-        self.jsBridge.injectJS()
+        
     }
     
     public func webViewIsLoadingWith(_ progress: TimeInterval) {
@@ -88,17 +72,17 @@ public class XViewController: UIViewController {
     }
     
     //MARK: - private
-    
+
     private func loadRequest(withURL url: URL?) {
         guard let url = url else {
             return
         }
-        self.webViewEngine?.loadRequest(request: URLRequest(url: url))
+        self.engine?.loadRequest(request: URLRequest(url: url))
     }
     
-    private func initView() {
-        self.webViewEngine = self.createWebViewEngine()
-        if let view = self.webViewEngine?.view {
+    private func initWebViewEngine() {
+        self.engine = self.createWebViewEngine()
+        if let view = self.engine?.view {
             self.view.addSubview(view)
         }
     }
@@ -109,4 +93,59 @@ public class XViewController: UIViewController {
         return engine
     }
     
+    private func intercept(request: URLRequest) -> Bool {
+        let url = request.url
+        guard let scheme = url?.scheme, scheme == "jsbridgex" else {
+            return false
+        }
+        guard let host = url?.host, host == "ready" else {
+            return false
+        }
+        self.fetchMessagesFromJS()
+        return true
+    }
+    
+    private func fetchMessagesFromJS() {
+        self.engine?.executeJavaScript(js: "JSBridge.fetchMessageQueue()") { (object, error) in
+            guard let jsonString = object as? String else {
+                return
+            }
+            let messages = self.messageQueue(with: jsonString) ?? []
+            for m in messages {
+                if let message = m {
+                    self.exec(message)
+                }
+            }
+        }
+    }
+    
+    private func messageQueue(with jsonString: String) -> [XMessage?]? {
+        guard let data = jsonString.data(using: .utf8) else {
+            return nil
+        }
+        guard let jsonArray = (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)) as? [Any] else {
+            return nil
+        }
+        return jsonArray.flatMap { (data) -> XMessage? in
+            return XMessage(array: data as? [Any])
+        }
+    }
+    
+    private func exec(_ message: XMessage) {
+        let plugin = self.plugin(named: message.plugin)
+        let method: Selector = NSSelectorFromString("\(message.action)")
+        
+        _ = plugin?.perform(method)
+    }
+    
+    private func plugin(named name: String) -> XPlugin? {
+        var plugin = self.pluginObjectMap[name]
+        if plugin == nil {
+            if let pluginType = XPlugin.classNamed(name) {
+                plugin = pluginType.init(viewController: self)
+                self.pluginObjectMap[name] = plugin
+            }
+        }
+        return plugin
+    }
 }

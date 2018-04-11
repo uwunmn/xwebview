@@ -9,9 +9,13 @@
 import WebKit
 
 public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
+
+    var delegate: UIWebViewDelegate?
     
     private let webView: UIWebView
-    weak var delegate: UIWebViewDelegate?
+    private lazy var bridge: XJSBridge = {
+        return XJSBridge(engine: self)
+    }()
     
     //MARK: - XWebViewEngine
     
@@ -45,6 +49,7 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
+        self.bridge.injectJS()
         self.delegate?.webViewDidFinishLoad?(webView)
     }
     
@@ -66,6 +71,7 @@ public class UIWebViewDelegateImpl: NSObject, UIWebViewDelegate {
         if let controller = self.viewController {
             return controller.webViewShouldStartLoadWith(request)
         }
+        
         return true
     }
     

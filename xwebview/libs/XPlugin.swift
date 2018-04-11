@@ -10,10 +10,16 @@ import UIKit
 
 public class XPlugin: NSObject {
     
-    private weak var viewController: XViewController?
+    weak var viewController: XViewController?
 
     required public init(viewController: XViewController) {
         self.viewController = viewController
     }
     
+    public class func classNamed(_ className: String) -> XPlugin.Type? {
+        if let appName = Bundle.main.infoDictionary!["CFBundleName"] as? String {
+            return NSClassFromString("\((appName)).\(className)") as? XPlugin.Type
+        }
+        return nil
+    }
 }

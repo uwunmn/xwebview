@@ -76,20 +76,11 @@
         }
 
         connectJSBridge(function(bridge) {
-            bridge.init(function(message) {
-                log('Undefined Event', JSON.stringify(message));
-            });
-
             window.sendMessage = function() {
-                bridge.send('Hello', null, function(data, code) {
+                bridge.invoke('Demo', 'hello', null, function(data, code) {
                     log('Hello response', 'code: ' + code + ', data: ' + JSON.stringify(data));
                 });
             };
-
-            bridge.registerEvent('SendMessage', function(data, callback) {
-                log('SendMessage', JSON.stringify(data));
-                callback(200, {'desc': 'Success'})
-            });
         });
     </script>
     <button type="button" class="btn btn-primary" onclick="sendMessage()">Send message to Native</button>

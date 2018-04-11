@@ -1,1 +1,87 @@
-"use strict";!function(e,n){function t(e){h=e}function o(e,n){k[e]=n}function i(e){k[e]&&delete k[e]}function s(e,n,t){console.log("[send]eventName:"+e+", data: "+JSON.stringify(n));var o={};if(o[b]=N,e&&(o[p]=e),n&&(o[_]=n),"function"==typeof t){var i="js_cb_"+I++ +"_"+(new Date).getTime();C[i]=t,o[M]=i}g(o)}function a(e,n,t){var o={};o[b]=S,o[J]=e,o[M]=n,t&&(o[_]=t),g(o)}function c(){s("listAllEvents",null,function(e,n){console.log("Events: "+JSON.stringify(n.Events))})}function d(e){console.log("dispatchMessageFromNative: "+JSON.stringify(e)),setTimeout(function(){try{e.method===N?l(e):e.method===S&&r(e)}catch(e){console.log(e)}})}function l(e){console.log("handleMessageSentFromNative");var n=e.callbackId,t=k[e.eventName];return console.log("handleMessageSentFromNative - "+typeof t),"function"==typeof t?(console.log("handleMessageSentFromNative - eventHandler"),void t(e.data,function(e,t){n&&a(e,n,t)})):void("function"==typeof h&&h(e))}function r(e){console.log("handleMessageCallbackFromNative");var n=e.callbackId;if(n){var t=C[n];console.log(t),"function"==typeof t&&t(e.data,e.code)}}function g(e){O.push(e),f()}function f(){if(B)v.src=m+"://"+y+E;else if(F)try{AndroidAPI.dispatchMessageQueueFromJS(u())}catch(e){console.log(e)}}function u(){try{var e=O;O=[];var n=JSON.stringify(e);return console.log("[fetchMessageQueue] messages: "+n),n}catch(e){console.log(e)}return[]}if(!e.JSBridge){var v,h,m="jsbridgex",y="__JBX_HOST__",E="/__JBX_EVENT__",N="SEND",S="CALLBACK",b="method",p="eventName",_="data",J="code",M="callbackId",A=navigator.userAgent,B=/i(Phone|Pod|Pad|OS)/g.test(A),F=/Android/g.test(A),O=[],k={},C={},I=1;e.JSBridge={init:t.bind(this),registerEvent:o.bind(this),unregisterEvent:i.bind(this),send:s.bind(this),dispatchMessageFromNative:d.bind(this),fetchMessageQueue:u.bind(this),listAllEvents:c.bind(this)},v=n.createElement("iframe"),v.style.display="none",f(),n.documentElement.appendChild(v);var P=n.createEvent("Events");P.initEvent("JSBridgeReady"),P.bridge=JSBridge,n.dispatchEvent(P)}}(window,document);
+'use strict';
+
+(function(w, doc) {
+    if (w.JSBridge) return;
+
+    var ua = navigator.userAgent;
+    var isIOSDevice = /i(Phone|Pod|Pad|OS)/g.test(ua);
+    var isAndroidDevice = /Android/g.test(ua);
+    var eventUniqueId = Math.floor(Math.random() * 2000000000);
+    var messageQueue = [];
+    var callbacks = {};
+
+    //调用native方法
+    function invoke() {
+        try {
+            var plugin = arguments[0];
+            var action = arguments[1];
+            var data = arguments[2];
+            var callback = arguments[3];
+            var callbackId = 'INVALID';
+            if (callback && typeof callback === 'function') {
+                callbackId = 'js_cb_' + (eventUniqueId++);
+                callbacks[callbackId] = callback
+            }
+            var message = [plugin, action, data, callbackId];
+            messageQueue.push(message);
+            triggerNative();
+        } catch (error) {
+            console.log('invoke(plugin, action, data, callback), error: ' + error);
+        }
+    }
+
+    //native回调
+    function callback() {
+        try {
+            var status = arguments[0];
+            var callbackId = arguments[1];
+            var data = arguments[2];
+    
+            var callback = callbacks[callbackId];
+        } catch (error) {
+            console.log('callback(status, callbackId, data)');
+        }
+    }
+
+    function fetchMessageQueue() {
+        try {
+            var messages = messageQueue;
+            messageQueue = [];
+            var messageString = JSON.stringify(messages);
+            console.log('[fetchMessageQueue] messages: ' + messageString);
+            return messageString;
+        } catch (e) {
+            console.log(e);
+        }
+        return [];
+    }
+
+    //触发native处理message
+    function triggerNative() {
+        if (isIOSDevice) {
+            messagingIframe.src = 'jsbridgex://ready';
+        } else if (isAndroidDevice) {
+            try {
+                AndroidAPI.dispatchMessageQueueFromJS(fetchMessageQueue());
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }
+
+    w.JSBridge = {
+        invoke: invoke.bind(this),
+        callback: callback.bind(this),
+        fetchMessageQueue: fetchMessageQueue.bind(this),
+    };
+
+    var messagingIframe = doc.createElement('iframe');
+    messagingIframe.style.display = 'none';
+    triggerNative();
+    doc.documentElement.appendChild(messagingIframe);
+
+    var readyEvent = doc.createEvent('Events');
+    readyEvent.initEvent('JSBridgeReady');
+    readyEvent.bridge = JSBridge;
+    doc.dispatchEvent(readyEvent);
+})(window, document);

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		262B380D200F4D5500C7E68A /* JSBridge.js in Resources */ = {isa = PBXBuildFile; fileRef = 262B380C200F4D5400C7E68A /* JSBridge.js */; };
+		261DA3F8207AFB330095A477 /* JSBridge.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 261DA3F7207AFB330095A477 /* JSBridge.min.js */; };
 		262B380F200F4D6100C7E68A /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 262B380E200F4D6100C7E68A /* index.html */; };
 		2674A52E2003542E007F10BE /* DemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674A52D2003542E007F10BE /* DemoViewController.swift */; };
 		2674A531200355BB007F10BE /* XJSBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674A530200355BB007F10BE /* XJSBridge.swift */; };
@@ -19,10 +19,11 @@
 		26917E941FFB84B60089D0DD /* XMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26917E931FFB84B60089D0DD /* XMessage.swift */; };
 		26E01C881FF6436500D371D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26E01C871FF6436500D371D7 /* AppDelegate.swift */; };
 		26E01C8F1FF6436500D371D7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26E01C8E1FF6436500D371D7 /* Assets.xcassets */; };
+		26F37DA92022C58100617A7A /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F37DA82022C58100617A7A /* Demo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		262B380C200F4D5400C7E68A /* JSBridge.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = JSBridge.js; sourceTree = "<group>"; };
+		261DA3F7207AFB330095A477 /* JSBridge.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = JSBridge.min.js; sourceTree = "<group>"; };
 		262B380E200F4D6100C7E68A /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 		2674A52D2003542E007F10BE /* DemoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoViewController.swift; sourceTree = "<group>"; };
 		2674A530200355BB007F10BE /* XJSBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XJSBridge.swift; sourceTree = "<group>"; };
@@ -36,6 +37,7 @@
 		26E01C871FF6436500D371D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		26E01C8E1FF6436500D371D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		26E01C931FF6436500D371D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		26F37DA82022C58100617A7A /* Demo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,7 +54,7 @@
 		2674A52C1FFF7ECA007F10BE /* js */ = {
 			isa = PBXGroup;
 			children = (
-				262B380C200F4D5400C7E68A /* JSBridge.js */,
+				261DA3F7207AFB330095A477 /* JSBridge.min.js */,
 			);
 			path = js;
 			sourceTree = "<group>";
@@ -100,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				26917E821FFB7D680089D0DD /* libs */,
+				26F37DA72022C56B00617A7A /* plugin */,
 				26E01C871FF6436500D371D7 /* AppDelegate.swift */,
 				2674A52D2003542E007F10BE /* DemoViewController.swift */,
 				262B380E200F4D6100C7E68A /* index.html */,
@@ -107,6 +110,14 @@
 				26E01C931FF6436500D371D7 /* Info.plist */,
 			);
 			path = xwebview;
+			sourceTree = "<group>";
+		};
+		26F37DA72022C56B00617A7A /* plugin */ = {
+			isa = PBXGroup;
+			children = (
+				26F37DA82022C58100617A7A /* Demo.swift */,
+			);
+			path = plugin;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,7 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				262B380F200F4D6100C7E68A /* index.html in Resources */,
-				262B380D200F4D5500C7E68A /* JSBridge.js in Resources */,
+				261DA3F8207AFB330095A477 /* JSBridge.min.js in Resources */,
 				26E01C8F1FF6436500D371D7 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -187,6 +198,7 @@
 				26917E871FFB7E3C0089D0DD /* XWebViewEngine.swift in Sources */,
 				26917E911FFB81E90089D0DD /* WKWebViewEngine.swift in Sources */,
 				2674A531200355BB007F10BE /* XJSBridge.swift in Sources */,
+				26F37DA92022C58100617A7A /* Demo.swift in Sources */,
 				26917E851FFB7D850089D0DD /* XPlugin.swift in Sources */,
 				26E01C881FF6436500D371D7 /* AppDelegate.swift in Sources */,
 				2674A52E2003542E007F10BE /* DemoViewController.swift in Sources */,

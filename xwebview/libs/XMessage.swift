@@ -8,90 +8,26 @@
 
 import Foundation
 
-//public class XCommand {
-//    public private(set) var pluginName: String
-//    public private(set) var methodName: String
-//    public private(set) var arguments: [String]
-//    public private(set) var callbackID: String
-//
-//    public init(json: String) {
-//
-//    }
-//}
-
-private let JBX_KEY_METHOD = "method"
-private let JBX_KEY_EVENT_NAME = "eventName"
-private let JBX_KEY_DATA = "data"
-private let JBX_KEY_CODE = "code"
-private let JBX_KEY_CALLBACK_ID = "callbackId"
-
-public class XMessage {
+public struct XMessage {
     
-    public var method: String {
-        didSet {
-            self.dict[JBX_KEY_METHOD] = self.method
-        }
-    }
-    public var eventName: String? {
-        didSet {
-            self.dict[JBX_KEY_EVENT_NAME] = self.eventName
-        }
-    }
-    public var code: Int? {
-        didSet {
-            self.dict[JBX_KEY_CODE] = self.code
-        }
-    }
-    public var data: Any? {
-        didSet {
-            self.dict[JBX_KEY_DATA] = self.data
-        }
-    }
+    public var plugin: String
+    public var action: String
+    public var data: [Any]?
+    public var callbackId: String?
     
-    public var callbackId: String? {
-        didSet {
-            self.dict[JBX_KEY_CALLBACK_ID] = self.callbackId
+    public init?(array: [Any]?) {
+        guard let array = array else {
+            return nil
         }
-    }
-    
-    public var description: String {
-        do {
-            let data = try JSONSerialization.data(withJSONObject: self.dict, options: .prettyPrinted)
-            return String(data: data, encoding: String.Encoding.utf8) ?? ""
-        } catch {
-            
+        guard let plugin = array[0] as? String else {
+            return nil
         }
-        return ""
-    }
-    
-    fileprivate var dict: [String: Any] = [:]
-    
-    public init(method: String) {
-        self.method = method
-        self.dict[JBX_KEY_METHOD] = method
-    }
-    
-    public init?(rawDict: [String: AnyObject]) {
-        if let method = rawDict[JBX_KEY_METHOD] as? String  {
-            self.method = method
-            self.eventName = rawDict[JBX_KEY_EVENT_NAME] as? String
-            self.code = rawDict[JBX_KEY_CODE] as? Int
-            self.data = rawDict[JBX_KEY_DATA]
-            self.callbackId = rawDict[JBX_KEY_CALLBACK_ID] as? String
-            self.dict = rawDict
-            return
+        guard let action = array[1] as? String else {
+            return nil
         }
-        
-        return nil
-    }
-    
-    public func toString() -> String {
-        do {
-            let data = try JSONSerialization.data(withJSONObject: self.dict, options: JSONSerialization.WritingOptions(rawValue: 0))
-            return String(data: data, encoding: String.Encoding.utf8) ?? ""
-        } catch {
-            
-        }
-        return ""
+        self.plugin = plugin
+        self.action = action
+        self.data = array[2] as? [Any]
+        self.callbackId = array[3] as? String
     }
 }
