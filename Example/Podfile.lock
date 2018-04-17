@@ -1,0 +1,16 @@
+PODS:
+  - xwebview (0.1.0)
+
+DEPENDENCIES:
+  - xwebview (from `../`)
+
+EXTERNAL SOURCES:
+  xwebview:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  xwebview: 272516ee1a3f2b316baecee0d03d8da32e210b20
+
+PODFILE CHECKSUM: 9f735baf202e03da99108cdfcc3ff1cbb376f6b0
+
+COCOAPODS: 1.5.0
