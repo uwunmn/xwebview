@@ -14,7 +14,7 @@ open class XWebView: UIView {
     private weak var viewController: XWebViewController?
     private var url: URL?
     
-    init(frame: CGRect, viewController: XWebViewController) {
+    public init(frame: CGRect, viewController: XWebViewController?) {
         super.init(frame: frame)
         self.viewController = viewController
         self.setupViews()
@@ -28,14 +28,14 @@ open class XWebView: UIView {
         self.engine.view.frame = self.bounds
     }
     
-    public func loadRequest(withURL url: URL?) {
+    open func loadRequest(withURL url: URL?) {
         guard let url = url else {
             return
         }
         self.engine.loadRequest(request: URLRequest(url: url))
     }
     
-    public func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+    open func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
         guard let js = js else {
             return
         }
@@ -46,7 +46,7 @@ open class XWebView: UIView {
         self.bridge.callbackToJS(with: callbackId, and: result)
     }
     
-    public func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
+    func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
         let isHandled = self.bridge.handleRequest(request) { (object, error) in
             guard let jsonString = object as? String else {
                 return
@@ -56,19 +56,19 @@ open class XWebView: UIView {
         return !isHandled
     }
     
-    public func webViewDidStartLoad() {
+    func webViewDidStartLoad() {
         
     }
     
-    public func webViewDidFinishLoad() {
+    func webViewDidFinishLoad() {
         self.bridge.injectJS()
     }
     
-    public func webViewIsLoadingWith(_ progress: TimeInterval) {
+    func webViewIsLoadingWith(_ progress: TimeInterval) {
         
     }
     
-    public func webViewDidFailLoadWith(_ error: Error) {
+    func webViewDidFailLoadWith(_ error: Error) {
         
     }
     
