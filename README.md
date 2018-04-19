@@ -22,7 +22,7 @@ pod 'xwebview'
 
 ## Author
 
-knop, cxh@taolx.com
+knop0211@gmail.com
 
 ## License
 
