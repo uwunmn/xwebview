@@ -11,9 +11,13 @@ import UIKit
 public protocol XWebViewEngine: class {
     var view: UIView { get }
     
-    init(frame: CGRect)
-    
     func loadRequest(request: URLRequest)
     
-    func executeJavaScript(js: String, completionHandler: ((Any?, Error?) -> Void)?)
+    func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?)
+}
+
+extension XWebViewEngine {
+    public static func createEngine() -> XWebViewEngine {
+        return UIWebViewEngine()
+    }
 }

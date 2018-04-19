@@ -30,4 +30,8 @@ open class XPluginMessage: NSObject {
         self.data = array[2] as? [Any]
         self.callbackId = array[3] as? String
     }
+    
+    open override var description: String {
+        return "\(plugin).\(action)"
+    }
 }

@@ -13,9 +13,6 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
     var delegate: UIWebViewDelegate?
     
     private let webView: UIWebView
-    private lazy var bridge: XJSBridge = {
-        return XJSBridge(engine: self)
-    }()
     
     //MARK: - XWebViewEngine
     
@@ -23,8 +20,8 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
         return self.webView
     }
     
-    required public init(frame: CGRect) {
-        self.webView = UIWebView(frame: frame)
+    override public init() {
+        self.webView = UIWebView()
         super.init()
         self.webView.delegate = self
     }
@@ -33,7 +30,10 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
         self.webView.loadRequest(request)
     }
     
-    public func executeJavaScript(js: String, completionHandler: ((Any?, Error?) -> Void)?) {
+    public func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        guard let js = js else {
+            return
+        }
         let result = self.webView.stringByEvaluatingJavaScript(from: js)
         completionHandler?(result, nil)
     }
@@ -49,7 +49,6 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
-        self.bridge.injectJS()
         self.delegate?.webViewDidFinishLoad?(webView)
     }
     
@@ -61,29 +60,25 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
 
 public class UIWebViewDelegateImpl: NSObject, UIWebViewDelegate {
     
-    weak var viewController: XViewController?
+    private weak var webView: XWebView?
     
-    init(viewController: XViewController) {
-        self.viewController = viewController
+    init(webView: XWebView) {
+        self.webView = webView
     }
     
     public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        if let controller = self.viewController {
-            return controller.webViewShouldStartLoadWith(request)
-        }
-        
-        return true
+        return self.webView?.webViewShouldStartLoadWith(request) ?? true
     }
     
     public func webViewDidStartLoad(_ webView: UIWebView) {
-        self.viewController?.webViewDidStartLoad()
+        self.webView?.webViewDidStartLoad()
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
-        self.viewController?.webViewDidFinishLoad()
+        self.webView?.webViewDidFinishLoad()
     }
     
     public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
-        self.viewController?.webViewDidFailLoadWith(error)
+        self.webView?.webViewDidFailLoadWith(error)
     }
 }

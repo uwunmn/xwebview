@@ -10,16 +10,9 @@ import UIKit
 
 open class XPlugin: NSObject {
     
-    open weak var viewController: XViewController?
-
-    public class func classNamed(_ className: String) -> XPlugin.Type? {
-        if let appName = Bundle.main.infoDictionary!["CFBundleName"] as? String {
-            return NSClassFromString("\((appName)).\(className)") as? XPlugin.Type
-        }
-        return nil
-    }
+    open weak var viewController: XWebViewController?
     
-    required public init(viewController: XViewController) {
+    required public init(viewController: XWebViewController?) {
         self.viewController = viewController
     }
     
@@ -27,6 +20,10 @@ open class XPlugin: NSObject {
         guard let callbackId = callbackId else {
             return
         }
-        self.viewController?.callbackToJS(callbackId: callbackId, result: result)
+        self.viewController?.callbackToJS(with: callbackId, and: result)
+    }
+    
+    open func executeJavaScript(js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        self.viewController?.executeJavaScript(js, completionHandler: completionHandler)
     }
 }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class XJSBridge {
+class XJSBridge {
 
     private let JBX_SCHEME = "jsbridgex"
     private let JBX_HOST = "ready"
@@ -16,6 +16,7 @@ public class XJSBridge {
     private var messages: [XPluginMessage] = []
     private var eventUniqueId = 0
     private var isBridgeReady = false
+    private weak var engine: XWebViewEngine?
     
     private lazy var js: String? = {
         let resourceBundle = Bundle(for: XJSBridge.self)
@@ -29,19 +30,45 @@ public class XJSBridge {
         return try? String(contentsOfFile: jsFilePath)
     }()
     
-    private weak var engine: XWebViewEngine?
-    
-    public init(engine: XWebViewEngine) {
+    init(engine: XWebViewEngine) {
         self.engine = engine
     }
     
-    public func injectJS() {
-        self.engine?.executeJavaScript(js: "typeof JSBridge === 'object'") { (object, error) in
+    func injectJS() {
+        self.engine?.executeJavaScript("typeof JSBridge === 'object'") { (object, error) in
             guard let js = self.js, let result = object as? String, result == "false" else {
                 return
             }
-            self.engine?.executeJavaScript(js: js, completionHandler: nil)
+            self.engine?.executeJavaScript(js, completionHandler: nil)
         }
+    }
+
+    func fetchMessagesFromJS(completionHandler handler: ((Any?, Error?) -> Void)?) {
+        self.engine?.executeJavaScript("JSBridge.fetchMessageQueue()", completionHandler: handler)
+    }
+    
+    func handleRequest(_ request: URLRequest, completionHandler handler: ((Any?, Error?) -> Void)?) -> Bool {
+        guard let url = request.url else {
+            return false
+        }
+        guard let scheme = url.scheme, scheme == "jsbridgex" else {
+            return false
+        }
+        guard let host = url.host, host == "ready" else {
+            return false
+        }
+        self.fetchMessagesFromJS(completionHandler: handler)
+        return true
+    }
+    
+    func callbackToJS(with callbackId: String, and result: XPluginResult) {
+        var js = "JSBridge.callback('\(callbackId)'"
+        if let json = result.jsonString {
+            js = js + ", " + json
+        }
+        js = js + ")"
+        
+        self.engine?.executeJavaScript(js, completionHandler: nil)
     }
 }
 
