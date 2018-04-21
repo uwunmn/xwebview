@@ -68,7 +68,9 @@ class XJSBridge {
         }
         js = js + ")"
         
-        self.engine?.executeJavaScript(js, completionHandler: nil)
+        self.engine?.executeJavaScript(js) { (object, error) in
+            print(error)
+        }
     }
 }
 

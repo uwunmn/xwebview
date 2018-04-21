@@ -9,16 +9,17 @@ import Foundation
 
 class XMessageDispatcher {
     
-    private weak var viewController: XWebViewController?
+    private weak var webView: XWebView?
     
-    init(viewController: XWebViewController?) {
-        self.viewController = viewController
+    init(webView: XWebView?) {
+        self.webView = webView
     }
     
     func handleMessages(with jsonString: String) {
+        print("messages: \(jsonString)")
         let messages = self.messageQueue(with: jsonString) ?? []
         for message in messages {
-            self.viewController?.handleMessage(message)
+            self.webView?.handleMessage(message)
         }
     }
     

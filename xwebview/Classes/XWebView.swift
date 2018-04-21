@@ -8,15 +8,16 @@
 import UIKit
 
 open class XWebView: UIView {
+    open var name: String?
+    
+    open private(set) var url: URL?
     private var engine: XWebViewEngine!
     private var bridge: XJSBridge!
     private var dispatcher: XMessageDispatcher!
-    private weak var viewController: XWebViewController?
-    private var url: URL?
+    private var pluginManager: XPluginManager?
     
-    public init(frame: CGRect, viewController: XWebViewController?) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
-        self.viewController = viewController
         self.setupViews()
     }
     
@@ -32,6 +33,7 @@ open class XWebView: UIView {
         guard let url = url else {
             return
         }
+        self.url = url
         self.engine.loadRequest(request: URLRequest(url: url))
     }
     
@@ -42,11 +44,11 @@ open class XWebView: UIView {
         self.engine.executeJavaScript(js, completionHandler: completionHandler)
     }
     
-    func callbackToJS(with callbackId: String, and result: XPluginResult) {
+    open func callbackToJS(with callbackId: String, and result: XPluginResult) {
         self.bridge.callbackToJS(with: callbackId, and: result)
     }
     
-    func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
+    open func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool {
         let isHandled = self.bridge.handleRequest(request) { (object, error) in
             guard let jsonString = object as? String else {
                 return
@@ -56,19 +58,19 @@ open class XWebView: UIView {
         return !isHandled
     }
     
-    func webViewDidStartLoad() {
+    open func webViewDidStartLoad() {
         
     }
     
-    func webViewDidFinishLoad() {
+    open func webViewDidFinishLoad() {
         self.bridge.injectJS()
     }
     
-    func webViewIsLoadingWith(_ progress: TimeInterval) {
+    open func webViewIsLoadingWith(_ progress: TimeInterval) {
         
     }
     
-    func webViewDidFailLoadWith(_ error: Error) {
+    open func webViewDidFailLoadWith(_ error: Error) {
         
     }
     
@@ -79,11 +81,16 @@ open class XWebView: UIView {
     }
     
     private func initEngine() {
-        self.dispatcher = XMessageDispatcher(viewController: self.viewController)
+        self.dispatcher = XMessageDispatcher(webView: self)
+        self.pluginManager = XPluginManager(webView: self)
         let engine = UIWebViewEngine()
         engine.delegate = UIWebViewDelegateImpl(webView: self)
         self.addSubview(engine.view)
         self.bridge = XJSBridge(engine: engine)
         self.engine = engine
+    }
+    
+    func handleMessage(_ message: XPluginMessage) {
+        self.pluginManager?.handleMessage(message)
     }
 }

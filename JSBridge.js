@@ -35,13 +35,13 @@
         try {
             var callbackId = arguments[0];
             var result = arguments[1];
-
+            console.log('callbackId: %s, result: %s', callbackId, result);
             if (callbackId) {
                 var callback = callbacks[callbackId];
                 callback && typeof callback === 'function' && callback(result)
             }
         } catch (error) {
-            console.log('callback(status, callbackId, data)');
+            console.log('callback(callbackId, data)');
         }
     }
 

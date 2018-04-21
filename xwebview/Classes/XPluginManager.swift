@@ -9,13 +9,13 @@ import Foundation
 
 class XPluginManager {
 
-    private weak var viewController: XWebViewController?
+    private weak var webView: XWebView?
     private let appName: String
     
     private var pluginObjectMap: [String: XPlugin] = [: ]
     
-    init(viewController: XWebViewController) {
-        self.viewController = viewController
+    init(webView: XWebView) {
+        self.webView = webView
         self.appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
     }
     
@@ -38,7 +38,7 @@ class XPluginManager {
         var plugin = self.pluginObjectMap[name]
         if plugin == nil {
             if let pluginType = self.classNamed(name) {
-                plugin = pluginType.init(viewController: self.viewController)
+                plugin = pluginType.init(webView: self.webView)
                 self.pluginObjectMap[name] = plugin
             }
         }

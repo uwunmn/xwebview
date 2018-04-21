@@ -34,6 +34,7 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
         guard let js = js else {
             return
         }
+        print("js: \(js)")
         let result = self.webView.stringByEvaluatingJavaScript(from: js)
         completionHandler?(result, nil)
     }
