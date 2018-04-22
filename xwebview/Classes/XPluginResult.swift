@@ -9,8 +9,9 @@
 import Foundation
 
 public enum ResultStatus: Int {
-    case success = 1
     case failure = 0
+    case success = 1
+    case progress = 2
 }
 
 open class XPluginResult {
@@ -28,8 +29,11 @@ open class XPluginResult {
         if let message = self.message {
             array.append(message)
         }
-        if let json = try? JSONSerialization.data(withJSONObject: array, options: .prettyPrinted) {
-            return String(data: json, encoding: String.Encoding.utf8)
+        do {
+            let json = try JSONSerialization.data(withJSONObject: array, options: .prettyPrinted)
+            return String(data: json, encoding: .utf8)
+        } catch let e {
+            print(e.localizedDescription)
         }
         return nil
     }
