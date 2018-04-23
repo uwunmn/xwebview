@@ -77,6 +77,7 @@ open class XWebView: UIView {
     //MARK: - private
     
     private func setupViews() {
+        self.backgroundColor = UIColor.clear
         self.initEngine()
     }
     
@@ -85,6 +86,8 @@ open class XWebView: UIView {
         self.pluginManager = XPluginManager(webView: self)
         let engine = UIWebViewEngine()
         engine.delegate = UIWebViewDelegateImpl(webView: self)
+        engine.view.backgroundColor = UIColor.clear
+        engine.view.isOpaque = false
         self.addSubview(engine.view)
         self.bridge = XJSBridge(engine: engine)
         self.engine = engine
