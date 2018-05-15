@@ -9,7 +9,7 @@ import UIKit
 
 open class XWebView: UIView {
     open var name: String?
-    
+    open weak var parentViewController: UIViewController?
     open private(set) var url: URL?
     private var engine: XWebViewEngine!
     private var bridge: XJSBridge!
