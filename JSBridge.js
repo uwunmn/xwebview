@@ -1,6 +1,6 @@
 'use strict';
 
-(function(w, doc) {
+(function (w, doc) {
     if (w.JSBridge) return;
 
     var ua = navigator.userAgent;
@@ -9,14 +9,33 @@
     var eventUniqueId = Math.floor(Math.random() * 2000000000);
     var messageQueue = [];
     var callbacks = {};
+    var eventMap = {};
 
-    //调用native方法
-    function invoke() {
+    function addEvent(eventName, eventHandler) {
+        eventMap[eventName] = eventHandler;
+    }
+
+    function removeEvent(eventName) {
+        if (eventMap[eventName]) {
+            delete eventMap[eventName];
+        }
+    }
+
+    //native调用JS的event
+    function invokeN(eventName, data) {
         try {
-            var plugin = arguments[0];
-            var action = arguments[1];
-            var data = arguments[2];
-            var callback = arguments[3];
+            var eventHandler = eventMap[eventName];
+            if (typeof eventHandler === 'function') {
+                eventHandler(data);
+            }
+        } catch (error) {
+            console.log('invoke(plugin, action, data, callback), error: ' + error);
+        }
+    }
+
+    //JS调用native方法
+    function invoke(plugin, action, data, callback) {
+        try {
             var callbackId = 'INVALID';
             if (callback && typeof callback === 'function') {
                 callbackId = 'js_cb_' + (eventUniqueId++);
@@ -31,17 +50,15 @@
     }
 
     //native回调
-    function callback() {
+    function callback(callbackID, result) {
         try {
-            var callbackId = arguments[0];
-            var result = arguments[1];
-            console.log('callbackId: %s, result: %s', callbackId, result);
-            if (callbackId) {
-                var callback = callbacks[callbackId];
+            console.log('callbackId: %s, result: %s', callbackID, result);
+            if (callbackID) {
+                var callback = callbacks[callbackID];
                 callback && typeof callback === 'function' && callback(result)
             }
         } catch (error) {
-            console.log('callback(callbackId, data)');
+            console.log('callback(callbackID, data)');
         }
     }
 
@@ -72,7 +89,10 @@
     }
 
     w.JSBridge = {
+        addEvent: addEvent.bind(this),
+        removeEvent: removeEvent.bind(this),
         invoke: invoke.bind(this),
+        invokeN: invokeN.bind(this),
         callback: callback.bind(this),
         fetchMessageQueue: fetchMessageQueue.bind(this),
     };

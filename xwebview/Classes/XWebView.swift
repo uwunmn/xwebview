@@ -10,6 +10,7 @@ import UIKit
 open class XWebView: UIView {
     open var name: String?
     open weak var parentViewController: UIViewController?
+    open weak var delegate: XWebViewDelegate?
     open private(set) var url: URL?
     private var engine: XWebViewEngine!
     private var bridge: XJSBridge!
@@ -44,6 +45,10 @@ open class XWebView: UIView {
         self.engine.executeJavaScript(js, completionHandler: completionHandler)
     }
     
+    open func invokeJSEvent(message: XPluginMessage) {
+        self.bridge.invokeJSEvent(message: message)
+    }
+    
     open func callbackToJS(with callbackId: String, and result: XPluginResult) {
         self.bridge.callbackToJS(with: callbackId, and: result)
     }
@@ -55,23 +60,27 @@ open class XWebView: UIView {
             }
             self.dispatcher.handleMessages(with: jsonString)
         }
-        return !isHandled
+        if isHandled {
+            return false
+        }
+        return self.delegate?.webViewShouldStartLoadWith(request) ?? true
     }
     
     open func webViewDidStartLoad() {
-        
+        self.delegate?.webViewDidStartLoad()
     }
     
     open func webViewDidFinishLoad() {
         self.bridge.injectJS()
+        self.delegate?.webViewDidFinishLoad()
     }
     
     open func webViewIsLoadingWith(_ progress: TimeInterval) {
-        
+        self.delegate?.webViewIsLoadingWith(progress)
     }
     
     open func webViewDidFailLoadWith(_ error: Error) {
-        
+        self.delegate?.webViewDidFailLoadWith(error)
     }
     
     //MARK: - private
@@ -96,4 +105,12 @@ open class XWebView: UIView {
     func handleMessage(_ message: XPluginMessage) {
         self.pluginManager?.handleMessage(message)
     }
+}
+
+public protocol XWebViewDelegate: class {
+    func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool
+    func webViewDidStartLoad()
+    func webViewDidFinishLoad()
+    func webViewIsLoadingWith(_ progress: TimeInterval)
+    func webViewDidFailLoadWith(_ error: Error)
 }

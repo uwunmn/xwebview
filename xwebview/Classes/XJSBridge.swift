@@ -72,5 +72,24 @@ class XJSBridge {
             print(error)
         }
     }
+
+    func invokeJSEvent(message: XPluginMessage) {
+        var js = "JSBridge.invokeN('\(message.action)'"
+        if let data = message.data {
+            do {
+                let json = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
+                if let jsonString = String(data: json, encoding: .utf8) {
+                    js = js + ", " + jsonString
+                }
+            } catch let e {
+                print(e.localizedDescription)
+            }
+        }
+        js = js + ")"
+        
+        self.engine?.executeJavaScript(js) { (object, error) in
+            print(error)
+        }
+    }
 }
 

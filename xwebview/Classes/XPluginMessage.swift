@@ -15,6 +15,15 @@ open class XPluginMessage: NSObject {
     public var data: [Any]?
     public var callbackId: String?
     
+    public init(action: String, data: Any? = nil, callbackId: String? = nil) {
+        self.plugin = ""
+        self.action = action
+        if let data = data {
+            self.data = [data]
+        }
+        self.callbackId = callbackId
+    }
+    
     public init?(array: [Any]?) {
         guard let array = array else {
             return nil
