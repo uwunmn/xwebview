@@ -63,24 +63,24 @@ open class XWebView: UIView {
         if isHandled {
             return false
         }
-        return self.delegate?.webViewShouldStartLoadWith(request) ?? true
+        return self.delegate?.webView(self, shouldStartLoadWith: request) ?? true
     }
     
     open func webViewDidStartLoad() {
-        self.delegate?.webViewDidStartLoad()
+        self.delegate?.webViewDidStartLoad(self)
     }
     
     open func webViewDidFinishLoad() {
         self.bridge.injectJS()
-        self.delegate?.webViewDidFinishLoad()
+        self.delegate?.webViewDidFinishLoad(self)
     }
     
     open func webViewIsLoadingWith(_ progress: TimeInterval) {
-        self.delegate?.webViewIsLoadingWith(progress)
+        self.delegate?.webView(self, withProgress: progress)
     }
     
     open func webViewDidFailLoadWith(_ error: Error) {
-        self.delegate?.webViewDidFailLoadWith(error)
+        self.delegate?.webView(self, didFailLoadWithError: error)
     }
     
     //MARK: - private
@@ -108,9 +108,9 @@ open class XWebView: UIView {
 }
 
 public protocol XWebViewDelegate: class {
-    func webViewShouldStartLoadWith(_ request: URLRequest) -> Bool
-    func webViewDidStartLoad()
-    func webViewDidFinishLoad()
-    func webViewIsLoadingWith(_ progress: TimeInterval)
-    func webViewDidFailLoadWith(_ error: Error)
+    func webView(_ webView: XWebView, shouldStartLoadWith request: URLRequest) -> Bool
+    func webViewDidStartLoad(_ webView: XWebView)
+    func webViewDidFinishLoad(_ webView: XWebView)
+    func webView(_ webView: XWebView, withProgress progress: TimeInterval)
+    func webView(_ webView: XWebView, didFailLoadWithError error: Error)
 }

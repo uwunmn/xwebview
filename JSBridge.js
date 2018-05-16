@@ -12,7 +12,10 @@
     var eventMap = {};
 
     function addEvent(eventName, eventHandler) {
-        eventMap[eventName] = eventHandler;
+        if (eventMap[eventName] == null) {
+            eventMap[eventName] = [];
+        }
+        eventMap[eventName].push(eventHandler)
     }
 
     function removeEvent(eventName) {
@@ -24,9 +27,12 @@
     //native调用JS的event
     function invokeN(eventName, data) {
         try {
-            var eventHandler = eventMap[eventName];
-            if (typeof eventHandler === 'function') {
-                eventHandler(data);
+            var eventList = eventMap[eventName];
+            for(var i = 0; i < eventList.length; i++) {
+                var eventHandler = eventList[i];
+                if (typeof eventHandler === 'function') {
+                    eventHandler(data);
+                }
             }
         } catch (error) {
             console.log('invoke(plugin, action, data, callback), error: ' + error);
