@@ -15,7 +15,12 @@
         if (eventMap[eventName] == null) {
             eventMap[eventName] = [];
         }
-        eventMap[eventName].push(eventHandler)
+        eventMap[eventName].push(eventHandler);
+    }
+
+    function setEvent(eventName, eventHandler) {
+        eventMap[eventName] = [];
+        eventMap[eventName].push(eventHandler);
     }
 
     function removeEvent(eventName) {
@@ -28,14 +33,16 @@
     function invokeN(eventName, data) {
         try {
             var eventList = eventMap[eventName];
-            for(var i = 0; i < eventList.length; i++) {
-                var eventHandler = eventList[i];
-                if (typeof eventHandler === 'function') {
-                    eventHandler(data);
+            if (eventList) {
+                for(var i = 0; i < eventList.length; i++) {
+                    var eventHandler = eventList[i];
+                    if (typeof eventHandler === 'function') {
+                        eventHandler(data);
+                    }
                 }
             }
         } catch (error) {
-            console.log('invoke(plugin, action, data, callback), error: ' + error);
+            console.log('invokeN(' + eventName + ', ' + data + '), error: ' + error);
         }
     }
 
@@ -51,7 +58,7 @@
             messageQueue.push(message);
             triggerNative();
         } catch (error) {
-            console.log('invoke(plugin, action, data, callback), error: ' + error);
+            console.log('invoke(' + plugin + ', ' + action + ', ' + data + ', callback), error: ' + error);
         }
     }
 
@@ -64,7 +71,7 @@
                 callback && typeof callback === 'function' && callback(result)
             }
         } catch (error) {
-            console.log('callback(callbackID, data)');
+            console.log('callback(' + callbackID + ', ' + data + ')');
         }
     }
 
@@ -95,6 +102,7 @@
     }
 
     w.JSBridge = {
+        setEvent: setEvent.bind(this),
         addEvent: addEvent.bind(this),
         removeEvent: removeEvent.bind(this),
         invoke: invoke.bind(this),
