@@ -11,6 +11,9 @@ import UIKit
 open class XPlugin: NSObject {
     
     open weak var webView: XWebView?
+    open var viewController: UIViewController? {
+        return self.webView?.parentViewController
+    }
     
     required public init(webView: XWebView?) {
         self.webView = webView

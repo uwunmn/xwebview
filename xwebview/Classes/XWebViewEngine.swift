@@ -11,13 +11,15 @@ import UIKit
 public protocol XWebViewEngine: class {
     var view: UIView { get }
     
+    var scrollView: UIScrollView { get }
+    
+    var scrollViewDelegate: UIScrollViewDelegate? { get set }
+    
+    init(webView: XWebView?)
+    
     func loadRequest(request: URLRequest)
     
+    func reload()
+    
     func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?)
-}
-
-extension XWebViewEngine {
-    public static func createEngine() -> XWebViewEngine {
-        return UIWebViewEngine()
-    }
 }

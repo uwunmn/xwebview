@@ -8,19 +8,43 @@
 
 import Foundation
 
+open class XJSEvent: NSObject {
+    
+    open var name: String
+    open var data: [String: Any]?
+    
+    public init(name: String, data: [String: Any]? = nil) {
+        self.name = name
+        self.data = data
+    }
+    
+    public init?(array: [Any]?) {
+        guard let array = array else {
+            return nil
+        }
+        guard let name = array[0] as? String else {
+            return nil
+        }
+        self.name = name
+        self.data = array[1] as? [String: Any]
+    }
+    
+    override open var description: String {
+        return "\(self.name)"
+    }
+}
+
 open class XPluginMessage: NSObject {
     
-    public var plugin: String
-    public var action: String
-    public var data: [Any]?
-    public var callbackId: String?
+    open var plugin: String
+    open var action: String
+    open var data: [String: Any]?
+    open var callbackId: String?
     
-    public init(action: String, data: Any? = nil, callbackId: String? = nil) {
+    public init(action: String, data: [String: Any]? = nil, callbackId: String? = nil) {
         self.plugin = ""
         self.action = action
-        if let data = data {
-            self.data = [data]
-        }
+        self.data = data
         self.callbackId = callbackId
     }
     
@@ -36,11 +60,11 @@ open class XPluginMessage: NSObject {
         }
         self.plugin = plugin
         self.action = action
-        self.data = array[2] as? [Any]
+        self.data = array[2] as? [String: Any]
         self.callbackId = array[3] as? String
     }
     
-    open override var description: String {
+    override open var description: String {
         return "\(plugin).\(action)"
     }
 }

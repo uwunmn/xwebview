@@ -8,14 +8,17 @@
 import UIKit
 
 open class XWebView: UIView {
-    open var name: String?
     open weak var parentViewController: UIViewController?
     open weak var delegate: XWebViewDelegate?
     open private(set) var url: URL?
-    private var engine: XWebViewEngine!
+    open var engine: XWebViewEngine!
     private var bridge: XJSBridge!
     private var dispatcher: XMessageDispatcher!
     private var pluginManager: XPluginManager?
+    
+    open var scrollView: UIScrollView {
+        return self.engine.scrollView
+    }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,6 +41,10 @@ open class XWebView: UIView {
         self.engine.loadRequest(request: URLRequest(url: url))
     }
     
+    open func reload() {
+        self.engine.reload()
+    }
+    
     open func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
         guard let js = js else {
             return
@@ -45,8 +52,8 @@ open class XWebView: UIView {
         self.engine.executeJavaScript(js, completionHandler: completionHandler)
     }
     
-    open func invokeJSEvent(message: XPluginMessage) {
-        self.bridge.invokeJSEvent(message: message)
+    open func invokeJSEvent(event: XJSEvent) {
+        self.bridge.invokeJSEvent(event: event)
     }
     
     open func callbackToJS(with callbackId: String, and result: XPluginResult) {
@@ -83,6 +90,10 @@ open class XWebView: UIView {
         self.delegate?.webView(self, didFailLoadWithError: error)
     }
     
+    func handleMessage(_ message: XPluginMessage) {
+        self.pluginManager?.handleMessage(message)
+    }
+    
     //MARK: - private
     
     private func setupViews() {
@@ -93,17 +104,24 @@ open class XWebView: UIView {
     private func initEngine() {
         self.dispatcher = XMessageDispatcher(webView: self)
         self.pluginManager = XPluginManager(webView: self)
-        let engine = UIWebViewEngine()
-        engine.delegate = UIWebViewDelegateImpl(webView: self)
-        engine.view.backgroundColor = UIColor.clear
-        engine.view.isOpaque = false
+        let engine = self.createWKWebViewEngine()
         self.addSubview(engine.view)
         self.bridge = XJSBridge(engine: engine)
         self.engine = engine
     }
     
-    func handleMessage(_ message: XPluginMessage) {
-        self.pluginManager?.handleMessage(message)
+    private func createUIWebViewEngine() -> XWebViewEngine {
+        let engine = UIWebViewEngine(webView: self)
+        engine.view.backgroundColor = UIColor.clear
+        engine.view.isOpaque = false
+        return engine
+    }
+
+    private func createWKWebViewEngine() -> XWebViewEngine {
+        let engine = WKWebViewEngine(webView: self)
+        engine.view.backgroundColor = UIColor.clear
+        engine.view.isOpaque = false
+        return engine
     }
 }
 

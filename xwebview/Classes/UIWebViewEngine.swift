@@ -9,25 +9,42 @@
 import WebKit
 
 public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
-
-    var delegate: UIWebViewDelegate?
     
-    private let webView: UIWebView
+    private weak var xwebView: XWebView?
+    private let internalWebView = UIWebView()
     
     //MARK: - XWebViewEngine
     
-    public var view: UIView {
-        return self.webView
+    public required init(webView: XWebView?) {
+        self.xwebView = webView
+        super.init()
+        self.internalWebView.delegate = self
     }
     
-    override public init() {
-        self.webView = UIWebView()
-        super.init()
-        self.webView.delegate = self
+    public var scrollViewDelegate: UIScrollViewDelegate? {
+        get {
+            return self.internalWebView.scrollView.delegate
+        }
+        
+        set {
+            self.internalWebView.scrollView.delegate = newValue
+        }
+    }
+    
+    public var scrollView: UIScrollView {
+        return self.internalWebView.scrollView
+    }
+    
+    public var view: UIView {
+        return self.internalWebView
     }
     
     public func loadRequest(request: URLRequest) {
-        self.webView.loadRequest(request)
+        self.internalWebView.loadRequest(request)
+    }
+    
+    public func reload() {
+        self.internalWebView.reload()
     }
     
     public func executeJavaScript(_ js: String?, completionHandler: ((Any?, Error?) -> Void)?) {
@@ -35,51 +52,25 @@ public class UIWebViewEngine: NSObject, XWebViewEngine, UIWebViewDelegate {
             return
         }
         print("js: \(js)")
-        let result = self.webView.stringByEvaluatingJavaScript(from: js)
+        let result = self.internalWebView.stringByEvaluatingJavaScript(from: js)
         completionHandler?(result, nil)
     }
 
     //MARK: - UIWebViewDelegate
     
-    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        return self.delegate?.webView?(webView, shouldStartLoadWith: request, navigationType: navigationType) ?? true
+    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebView.NavigationType) -> Bool {
+        return self.xwebView?.webViewShouldStartLoadWith(request) ?? true
     }
     
     public func webViewDidStartLoad(_ webView: UIWebView) {
-        self.delegate?.webViewDidStartLoad?(webView)
+        self.xwebView?.webViewDidStartLoad()
     }
     
     public func webViewDidFinishLoad(_ webView: UIWebView) {
-        self.delegate?.webViewDidFinishLoad?(webView)
+        self.xwebView?.webViewDidFinishLoad()
     }
     
     public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
-        self.delegate?.webView?(webView, didFailLoadWithError: error)
-    }
-    
-}
-
-public class UIWebViewDelegateImpl: NSObject, UIWebViewDelegate {
-    
-    private weak var webView: XWebView?
-    
-    init(webView: XWebView) {
-        self.webView = webView
-    }
-    
-    public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        return self.webView?.webViewShouldStartLoadWith(request) ?? true
-    }
-    
-    public func webViewDidStartLoad(_ webView: UIWebView) {
-        self.webView?.webViewDidStartLoad()
-    }
-    
-    public func webViewDidFinishLoad(_ webView: UIWebView) {
-        self.webView?.webViewDidFinishLoad()
-    }
-    
-    public func webView(_ webView: UIWebView, didFailLoadWithError error: Error) {
-        self.webView?.webViewDidFailLoadWith(error)
+        self.xwebView?.webViewDidFailLoadWith(error)
     }
 }

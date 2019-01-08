@@ -20,11 +20,11 @@ class XJSBridge {
     
     private lazy var js: String? = {
         let resourceBundle = Bundle(for: XJSBridge.self)
-        var bundle = Bundle.main
+        var bundle: Bundle? = nil
         if let url = resourceBundle.url(forResource: "JS", withExtension: "bundle") {
-            bundle = Bundle(url: url) ?? Bundle.main
+            bundle = Bundle(url: url)
         }
-        guard let jsFilePath = bundle.path(forResource: "JSBridge", ofType: "js") else {
+        guard let jsFilePath = bundle?.path(forResource: "JSBridge", ofType: "js") else {
             return nil
         }
         return try? String(contentsOfFile: jsFilePath)
@@ -36,9 +36,11 @@ class XJSBridge {
     
     func injectJS() {
         self.engine?.executeJavaScript("typeof JSBridge === 'object'") { (object, error) in
-            guard let js = self.js, let result = object as? String, result == "false" else {
+            let result = (object as? String) ?? "false"
+            guard let js = self.js, result == "false" else {
                 return
             }
+            
             self.engine?.executeJavaScript(js, completionHandler: nil)
         }
     }
@@ -69,13 +71,15 @@ class XJSBridge {
         js = js + ")"
         
         self.engine?.executeJavaScript(js) { (object, error) in
-            print(error)
+            if let e = error {
+                print(e.localizedDescription)
+            }
         }
     }
 
-    func invokeJSEvent(message: XPluginMessage) {
-        var js = "JSBridge.invokeN('\(message.action)'"
-        if let data = message.data {
+    func invokeJSEvent(event: XJSEvent) {
+        var js = "JSBridge.invokeN('\(event.name)'"
+        if let data = event.data {
             do {
                 let json = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
                 if let jsonString = String(data: json, encoding: .utf8) {
@@ -88,7 +92,9 @@ class XJSBridge {
         js = js + ")"
         
         self.engine?.executeJavaScript(js) { (object, error) in
-            print(error)
+            if let e = error {
+                print(e.localizedDescription)
+            }
         }
     }
 }
