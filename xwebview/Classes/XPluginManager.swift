@@ -28,10 +28,16 @@ class XPluginManager {
     }
     
     func handleMessage(_ message: XPluginMessage) {
-        let plugin = self.plugin(named: message.plugin)
-        let method: Selector = NSSelectorFromString("\(message.action):")
-        
-        _ = plugin?.perform(method, with: message)
+        guard let plugin = self.plugin(named: message.plugin) else {
+            return
+        }
+        let methodName = "\(message.action):"
+        let method = NSSelectorFromString(methodName)
+        if plugin.responds(to: method) {
+            _ = plugin.perform(method, with: message)
+        } else {
+            print("\(methodName) is not found")
+        }
     }
     
     private func plugin(named name: String) -> XPlugin? {
