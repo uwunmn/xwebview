@@ -16,7 +16,7 @@ class XPluginManager {
     
     init(webView: XWebView) {
         self.webView = webView
-        self.appName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+        self.appName = (Bundle.main.infoDictionary!["CFBundleName"] as! String).replacingOccurrences(of: "-", with: "_")
     }
     
     public func classNamed(_ className: String) -> XPlugin.Type? {
